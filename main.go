@@ -16,6 +16,7 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/coreos/go-systemd/v22/dbus"
@@ -23,7 +24,9 @@ import (
 )
 
 func main() {
-	con, _ := dbus.NewSystemdConnection()
+	ctx := context.Background()
+	con, err := dbus.NewSystemdConnectionContext(ctx)
 	fmt.Println(con)
+	fmt.Println(err)
 	cmd.Execute()
 }
