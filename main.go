@@ -25,7 +25,8 @@ import (
 
 func main() {
 	ctx := context.Background()
-	con, err := dbus.NewSystemdConnectionContext(ctx)
+
+	con, err := dbus.NewUserConnectionContext(ctx)
 	fmt.Println(con)
 	fmt.Println(err)
 	cmd.Execute()
