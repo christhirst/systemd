@@ -15,8 +15,15 @@ limitations under the License.
 */
 package main
 
-import "github.com/gitpod/mycli/cmd"
+import (
+	"fmt"
+
+	"github.com/coreos/go-systemd/v22/dbus"
+	"github.com/gitpod/mycli/cmd"
+)
 
 func main() {
+	con, _ := dbus.NewSystemdConnection()
+	fmt.Println(con)
 	cmd.Execute()
 }
