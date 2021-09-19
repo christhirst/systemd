@@ -16,18 +16,35 @@ limitations under the License.
 package main
 
 import (
-	"context"
-	"fmt"
+	"html/template"
+	"log"
+	"os"
 
-	"github.com/coreos/go-systemd/v22/dbus"
-	"github.com/gitpod/mycli/cmd"
+	"github.com/golangcollege/sessions"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
-func main() {
-	ctx := context.Background()
+type application struct {
+	errorLog      *log.Logger
+	infoLog       *log.Logger
+	session       *sessions.Session
+	templateCache map[string]*template.Template
+}
 
-	con, err := dbus.NewUserConnectionContext(ctx)
-	fmt.Println(con)
-	fmt.Println(err)
-	cmd.Execute()
+func main() {
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app := &application{
+		errorLog: errorLog,
+		infoLog:  infoLog,
+	}
+	e := echo.New()
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://lokalhost", "https://labstack.net"},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+	}))
+	routes(e, app)
+	defer e.Close()
+
 }
