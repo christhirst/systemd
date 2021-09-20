@@ -10,14 +10,17 @@ import (
 )
 
 func (app *application) sendData(c echo.Context) error {
-	id := c.QueryParam("components")
-	fmt.Println(id)
+	params := c.QueryParams()
+
 	ctx := context.Background()
-	names := []string{
-		"pulseaudio.service",
+	var stringL []string
+	for _, v := range params {
+		stringL = append(stringL, v[0])
+
 	}
+	fmt.Println(stringL)
 	con, err := dbus.NewUserConnectionContext(ctx)
-	res, _ := con.ListUnitsByNamesContext(ctx, names)
+	res, _ := con.ListUnitsByNamesContext(ctx, stringL)
 	fmt.Println(con)
 	if err != nil {
 		fmt.Println(err)
