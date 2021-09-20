@@ -21,6 +21,7 @@ func (app *application) sendData(c echo.Context) error {
 	fmt.Println(stringL)
 	con, err := dbus.NewUserConnectionContext(ctx)
 	res, _ := con.ListUnitsByNamesContext(ctx, stringL)
+	con.RestartUnitContext(ctx, "gnome-keyring-ssh.service", "replace", nil)
 	fmt.Println(con)
 	if err != nil {
 		fmt.Println(err)
