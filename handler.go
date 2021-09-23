@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"sync"
 
 	"github.com/coreos/go-systemd/v22/dbus"
 	"github.com/labstack/echo"
@@ -17,36 +18,49 @@ type (
 	}
 )
 
+func process(wg *sync.WaitGroup, u *action, con *dbus.Conn, ctx context.Context, ch chan<- string) {
+	defer wg.Done()
+	for _, v := range u.SERVICE {
+
+		switch u.DO {
+		case "restart":
+			con.RestartUnitContext(ctx, v, "replace", ch)
+			fmt.Println("Today.")
+		case "stop":
+			con.StopUnitContext(ctx, v, "replace", ch)
+			fmt.Println("Tomorrow.")
+		case "start":
+			con.StartUnitContext(ctx, v, "replace", ch)
+			fmt.Println("In two days.")
+		case "kill":
+			con.KillUnitContext(ctx, v, 9)
+		default:
+			close(ch)
+		}
+	}
+
+}
+
 func (app *application) sendAction(c echo.Context) error {
+	var wg = sync.WaitGroup{}
 
 	u := &action{}
 
 	if err := c.Bind(u); err != nil {
 		return err
 	}
-	ctx := context.Background()
 
+	wg.Add(len(u.SERVICE))
+	ctx := context.Background()
+	ch := make(chan string)
 	con, err := dbus.NewUserConnectionContext(ctx)
+	go process(&wg, u, con, ctx, ch)
+	wg.Wait()
+
 	//res, _ := con.ListUnitsByNamesContext(ctx, u.SERVICE)
 
-	ch := make(chan string)
-
 	fmt.Println(u)
-	switch u.DO {
-	case "restart":
-		con.RestartUnitContext(ctx, u.SERVICE[0], "replace", ch)
-		fmt.Println("Today.")
-	case "stop":
-		con.StopUnitContext(ctx, u.SERVICE[0], "replace", ch)
-		fmt.Println("Tomorrow.")
-	case "start":
-		con.StartUnitContext(ctx, u.SERVICE[0], "replace", ch)
-		fmt.Println("In two days.")
-	case "kill":
-		con.KillUnitContext(ctx, u.SERVICE[0], 9)
-	default:
-		close(ch)
-	}
+
 	x := <-ch
 	fmt.Println("eee")
 	fmt.Println(x)
