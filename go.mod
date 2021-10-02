@@ -11,6 +11,7 @@ require (
 	github.com/godbus/dbus/v5 v5.0.4
 	github.com/golangcollege/sessions v1.2.0
 	github.com/labstack/echo v3.3.10+incompatible
+	github.com/labstack/echo/v4 v4.6.1
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pquerna/cachecontrol v0.1.0 // indirect

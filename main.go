@@ -19,10 +19,11 @@ import (
 	"html/template"
 	"log"
 	"os"
+	"time"
 
 	"github.com/golangcollege/sessions"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type application struct {
@@ -40,6 +41,10 @@ func main() {
 		infoLog:  infoLog,
 	}
 	e := echo.New()
+
+	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
+		Timeout: 180 * time.Second,
+	}))
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"http://lokalhost", "https://labstack.net"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
